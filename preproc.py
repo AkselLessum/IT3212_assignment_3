@@ -41,10 +41,37 @@ print(X_train.head())
 
 # Min-max scaling
 # Fit the scaler on the training set as to avoid data leakage onto test set
+cols = [
+    'Age at enrollment',
+    'Curricular units 1st sem (grade)',
+    'Curricular units 2nd sem (grade)',
+    'Unemployment rate',
+    'Inflation rate',
+    'GDP',
+    'Curricular units 1st sem (credited)',
+    'Curricular units 1st sem (enrolled)',
+    'Curricular units 1st sem (evaluations)',
+    'Curricular units 1st sem (approved)',
+    'Curricular units 1st sem (without evaluations)',
+    'Curricular units 2nd sem (credited)',
+    'Curricular units 2nd sem (enrolled)',
+    'Curricular units 2nd sem (evaluations)',
+    'Curricular units 2nd sem (approved)',
+    'Curricular units 2nd sem (without evaluations)',
+    'Application mode',
+    'Application order',
+    'Course',
+    'Daytime/evening attendance',
+    'Previous qualification',
+    'Nacionality',
+    "Mother's qualification",
+    "Father's qualification",
+    "Mother's occupation",
+    "Father's occupation"
+]
 scaler = MinMaxScaler() 
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
-
+X_train = scaler.fit_transform(X_train[cols])
+X_test = scaler.transform(X_test[cols])
 print(X_train[:5])# print first 5 rows of X_train
 
 
