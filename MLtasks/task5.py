@@ -1,8 +1,4 @@
-#Decision trees
-#Random Forest
-#Additive models
-#Naive Bayes
-#SVM with kernels (viable)
+# IDK how the output from preprocessing looks like, assuming csv file is the output
 
 from sklearn import tree
 from sklearn.model_selection import train_test_split
@@ -66,12 +62,7 @@ def naiveBayes():
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    #create model
-    model = SVC(kernel='linear')
-    model.fit(X_train, y_train)
-    #predict
-    y_pred = model.predict(X_test)
-    print("Naive Bayes accuracy: ", accuracy_score(y_test, y_pred))
+    #TODO: create model
 
 #SVM with kernels
 def svmKernels():
