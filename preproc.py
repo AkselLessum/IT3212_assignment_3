@@ -4,6 +4,7 @@ import category_encoders as ce
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import RFE
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+import matplotlib.pyplot as plt
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -54,10 +55,24 @@ lda = LinearDiscriminantAnalysis(n_components=1)
 X_train_lda = lda.fit_transform(X_train_selected, y_train)
 X_test_lda = lda.transform(rfe.transform(X_test))
 
-print("Shape of LDA-transformed training data:", X_train_lda.shape)
+'''print("Shape of LDA-transformed training data:", X_train_lda.shape)
 print("Shape of LDA-transformed test data:", X_test_lda.shape)
 
 # Optionally, you can analyze the LDA components
-print("LDA Components:", lda.coef_)  # This shows the direction of the separation
+print("LDA Components:", lda.coef_)  # This shows the direction of the separation'''
+
+# Visualize LDA results
+lda_df = pd.DataFrame(data=X_train_lda, columns=['LDA Component'])
+lda_df['Target'] = y_train.values  # Add the target variable for coloring
+
+# Scatter plot of LDA components
+plt.figure(figsize=(8, 6))
+colors = ['red' if label == 1 else 'blue' for label in lda_df['Target']]
+plt.scatter(lda_df['LDA Component'], [0]*len(lda_df), c=colors, alpha=0.5)
+plt.title('LDA: Projected Data Points')
+plt.xlabel('LDA Component 1')
+plt.yticks([])  # Hide y-axis
+plt.grid()
+plt.show()
 
 
