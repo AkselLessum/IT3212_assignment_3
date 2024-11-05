@@ -1,6 +1,9 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import category_encoders as ce
+from sklearn.linear_model import LogisticRegression
+from sklearn.feature_selection import RFE
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -21,8 +24,6 @@ df['Dropout'] = df['Target'].map({'Dropout': 1, 'Enrolled': 0, 'Graduate': 0})
 cat_cols = ['Application mode ', 'Course ', 'Previous qualification ', 'Nacionality ', "Mother's qualification ",
              "Father's qualification ", "Mother's occupation ", "Father's occupation "]
 
-print(df.info())
-print(df.head())
 
 # Split the dataset into test and train
 X = df.drop('Dropout', axis=1)
@@ -33,8 +34,16 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 # Fit the encoding on the training set as to avoid data leakage onto test set
 
 encoder = ce.TargetEncoder(cols=cat_cols, smoothing=0.3)
-X_train = encoder.fit_transform(X_train[cat_cols], y_train)
-X_test = encoder.transform(X_test[cat_cols])
+X_train[cat_cols] = encoder.fit_transform(X_train[cat_cols], y_train)
+X_test[cat_cols] = encoder.transform(X_test[cat_cols])
 
-print(X_train.head())
+print(y_test.info())
+
+# Create an estimator to be used by RFE
+estimator = LogisticRegression(max_iter=200)
+rfe = RFE(estimator, n_features_to_select=15)
+rfe.fit(X_train, y_train)
+# Select the features that RFE gets
+X_train = rfe.transform(X_train)
+X_test = rfe.transform(X_test)
 
