@@ -34,8 +34,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # encoder = ce.TargetEncoder(cols=cat_cols, smoothing=0.3)
 encoder = ce.TargetEncoder(cols=cat_cols)
-X_train = encoder.fit_transform(X_train[cat_cols], y_train)
-X_test = encoder.transform(X_test[cat_cols])
+X_train[cat_cols] = encoder.fit_transform(X_train[cat_cols], y_train)
+X_test[cat_cols] = encoder.transform(X_test[cat_cols])
 
 print(X_train.head())
 
