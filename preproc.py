@@ -46,7 +46,18 @@ rfe.fit(X_train, y_train)
 X_train_selected = rfe.transform(X_train)
 X_test_selected = rfe.transform(X_test)
 
+'''selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
+print(selected_features.info())'''
 
-selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
-print(selected_features.info())
+# LDA wants fewer dimensions than the number of classes: 1 class for binary classification
+lda = LinearDiscriminantAnalysis(n_components=1)
+X_train_lda = lda.fit_transform(X_train_selected, y_train)
+X_test_lda = lda.transform(rfe.transform(X_test))
+
+print("Shape of LDA-transformed training data:", X_train_lda.shape)
+print("Shape of LDA-transformed test data:", X_test_lda.shape)
+
+# Optionally, you can analyze the LDA components
+print("LDA Components:", lda.coef_)  # This shows the direction of the separation
+
 
