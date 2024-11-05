@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import category_encoders as ce
+from sklearn.preprocessing import MinMaxScaler
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -37,4 +38,18 @@ X_train = encoder.fit_transform(X_train[cat_cols], y_train)
 X_test = encoder.transform(X_test[cat_cols])
 
 print(X_train.head())
+
+# Min-max scaling
+# Fit the scaler on the training set as to avoid data leakage onto test set
+scaler = MinMaxScaler() 
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+print(X_train[:5])# print first 5 rows of X_train
+
+
+
+
+
+
 
