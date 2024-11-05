@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 #decision trees 
 def decisionTrees():
     #load data
-    data = pd.read_csv('../graduation_dataset.csv')
+    data = pd.read_csv('./graduation_dataset.csv')
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -33,7 +33,7 @@ def decisionTrees():
 #random forest
 def randomForest():
     #load data
-    data = pd.read_csv('../graduation_dataset.csv')
+    data = pd.read_csv('./graduation_dataset.csv')
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -47,7 +47,7 @@ def randomForest():
 #Additive model
 def additiveModel():
     #load data
-    data = pd.read_csv('../graduation_dataset.csv')
+    data = pd.read_csv('./graduation_dataset.csv')
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -61,7 +61,7 @@ def additiveModel():
 #SVM with kernels
 def svmKernels():
     #load data
-    data = pd.read_csv('../graduation_dataset.csv')
+    data = pd.read_csv('./graduation_dataset.csv')
     X = data.iloc[:, :-1]
     y = data.iloc[:, -1]
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
