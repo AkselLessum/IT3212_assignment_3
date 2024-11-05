@@ -19,6 +19,7 @@ df = df.join(one_hot)
 
 # Label encode target into dropout 1 and enrolled/graduate 0
 df['Dropout'] = df['Target'].map({'Dropout': 1, 'Enrolled': 0, 'Graduate': 0})
+df = df.drop('Target', axis=1)
 
 # Identify target columns and columns for target encoding (categorical columns with many unique values)
 cat_cols = ['Application mode ', 'Course ', 'Previous qualification ', 'Nacionality ', "Mother's qualification ",
@@ -37,13 +38,15 @@ encoder = ce.TargetEncoder(cols=cat_cols, smoothing=0.3)
 X_train[cat_cols] = encoder.fit_transform(X_train[cat_cols], y_train)
 X_test[cat_cols] = encoder.transform(X_test[cat_cols])
 
-print(y_test.info())
-
 # Create an estimator to be used by RFE
-estimator = LogisticRegression(max_iter=200)
+estimator = LogisticRegression(max_iter=2000)
 rfe = RFE(estimator, n_features_to_select=15)
 rfe.fit(X_train, y_train)
 # Select the features that RFE gets
-X_train = rfe.transform(X_train)
-X_test = rfe.transform(X_test)
+X_train_selected = rfe.transform(X_train)
+X_test_selected = rfe.transform(X_test)
+
+
+selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
+print(selected_features.info())
 
