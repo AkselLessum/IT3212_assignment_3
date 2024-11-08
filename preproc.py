@@ -29,59 +29,16 @@ cat_cols = ['Application mode', 'Course', 'Previous qualification', 'Nacionality
 
 # Split the dataset into test and train
 X = df.drop('Dropout', axis=1)
-df = df.drop('Target', axis=1)
 y = df['Dropout']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Target encoding
 # Fit the encoding on the training set as to avoid data leakage onto test set
 
-<<<<<<< HEAD
-encoder = ce.TargetEncoder(cols=cat_cols, smoothing=0.3)
-X_train[cat_cols] = encoder.fit_transform(X_train[cat_cols], y_train)
-X_test[cat_cols] = encoder.transform(X_test[cat_cols])
-
-# Create an estimator to be used by RFE
-estimator = LogisticRegression(max_iter=2000)
-rfe = RFE(estimator, n_features_to_select=15)
-rfe.fit(X_train, y_train)
-# Select the features that RFE gets
-X_train_selected = rfe.transform(X_train)
-X_test_selected = rfe.transform(X_test)
-
-'''selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
-print(selected_features.info())'''
-
-# LDA wants fewer dimensions than the number of classes: 1 class for binary classification
-lda = LinearDiscriminantAnalysis(n_components=1)
-X_train_lda = lda.fit_transform(X_train_selected, y_train)
-X_test_lda = lda.transform(rfe.transform(X_test))
-
-'''print("Shape of LDA-transformed training data:", X_train_lda.shape)
-print("Shape of LDA-transformed test data:", X_test_lda.shape)
-
-# Optionally, you can analyze the LDA components
-print("LDA Components:", lda.coef_)  # This shows the direction of the separation'''
-
-# Visualize LDA results
-lda_df = pd.DataFrame(data=X_train_lda, columns=['LDA Component'])
-lda_df['Target'] = y_train.values  # Add the target variable for coloring
-
-# Scatter plot of LDA components
-plt.figure(figsize=(8, 6))
-colors = ['red' if label == 1 else 'blue' for label in lda_df['Target']]
-plt.scatter(lda_df['LDA Component'], [0]*len(lda_df), c=colors, alpha=0.5)
-plt.title('LDA: Projected Data Points')
-plt.xlabel('LDA Component 1')
-plt.yticks([])  # Hide y-axis
-plt.grid()
-plt.show()
-=======
 # encoder = ce.TargetEncoder(cols=cat_cols, smoothing=0.3)
 encoder = ce.TargetEncoder(cols=cat_cols)
 X_train[cat_cols] = encoder.fit_transform(X_train[cat_cols], y_train)
 X_test[cat_cols] = encoder.transform(X_test[cat_cols])
->>>>>>> main
 
 
 
@@ -130,3 +87,40 @@ output_path = 'cleaned_data.csv'
 df.to_csv(output_path, index=False)
 print(f"Outlier handling complete. Cleaned dataset saved to '{output_path}'.")
 
+
+#RFE AND LDA
+# Create an estimator to be used by RFE
+estimator = LogisticRegression(max_iter=2000)
+rfe = RFE(estimator, n_features_to_select=15)
+rfe.fit(X_train, y_train)
+# Select the features that RFE gets
+X_train_selected = rfe.transform(X_train)
+X_test_selected = rfe.transform(X_test)
+
+'''selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
+print(selected_features.info())'''
+
+# LDA wants fewer dimensions than the number of classes: 1 class for binary classification
+lda = LinearDiscriminantAnalysis(n_components=1)
+X_train_lda = lda.fit_transform(X_train_selected, y_train)
+X_test_lda = lda.transform(rfe.transform(X_test))
+
+'''print("Shape of LDA-transformed training data:", X_train_lda.shape)
+print("Shape of LDA-transformed test data:", X_test_lda.shape)
+
+# Optionally, you can analyze the LDA components
+print("LDA Components:", lda.coef_)  # This shows the direction of the separation'''
+
+# Visualize LDA results
+lda_df = pd.DataFrame(data=X_train_lda, columns=['LDA Component'])
+lda_df['Target'] = y_train.values  # Add the target variable for coloring
+
+# Scatter plot of LDA components
+plt.figure(figsize=(8, 6))
+colors = ['red' if label == 1 else 'blue' for label in lda_df['Target']]
+plt.scatter(lda_df['LDA Component'], [0]*len(lda_df), c=colors, alpha=0.5)
+plt.title('LDA: Projected Data Points')
+plt.xlabel('LDA Component 1')
+plt.yticks([])  # Hide y-axis
+plt.grid()
+plt.show()
