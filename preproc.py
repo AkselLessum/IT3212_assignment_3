@@ -6,6 +6,7 @@ from sklearn.feature_selection import RFE
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import MinMaxScaler
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -131,3 +132,11 @@ plt.show()'''
 pca = PCA(n_components=10)
 X_train_pca = pca.fit_transform(X_train_selected)
 X_test_pca = pca.transform(rfe.transform(X_test))
+
+
+# Min-max scaling
+scaler = MinMaxScaler()
+X_train_pca = scaler.fit_transform(X_train_pca)
+X_test_pca = scaler.transform(X_test_pca)
+#print(X_train_pca)
+
