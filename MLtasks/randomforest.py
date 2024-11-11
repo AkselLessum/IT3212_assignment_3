@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import MinMaxScaler
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -113,6 +114,12 @@ X_test_lda = lda.transform(rfe.transform(X_test))'''
 pca = PCA(n_components=8)
 X_train_pca = pca.fit_transform(X_train_selected)
 X_test_pca = pca.transform(rfe.transform(X_test))
+
+# Min-max scaling
+scaler = MinMaxScaler()
+X_train_pca = scaler.fit_transform(X_train_pca)
+X_test_pca = scaler.transform(X_test_pca)
+#print(X_train_pca)
 
 # Random forest code
 # Create model
