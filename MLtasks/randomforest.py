@@ -109,13 +109,14 @@ print(selected_features.info())'''
 X_train_lda = lda.fit_transform(X_train_selected, y_train)
 X_test_lda = lda.transform(rfe.transform(X_test))'''
 
-pca = PCA(n_components=10)
+# Do PCA to not reduce dimensionality too far
+pca = PCA(n_components=8)
 X_train_pca = pca.fit_transform(X_train_selected)
 X_test_pca = pca.transform(rfe.transform(X_test))
 
 # Random forest code
 # Create model
-model = RandomForestClassifier(n_estimators=500)
+model = RandomForestClassifier(n_estimators=200)
 model.fit(X_train_pca, y_train)
     
 y_pred = model.predict(X_test_pca)
