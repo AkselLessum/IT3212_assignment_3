@@ -38,5 +38,5 @@ rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
 rf_model.fit(X_train, y_train)
 rf_pred = rf_model.predict(X_test)
 
-print("\nRandom Forest Model Accuracy:", accuracy_score(y_test, rf_pred))
-print("\nRandom Forest Model Classification Report:\n", classification_report(y_test, rf_pred))
+print("\nRandom Forest Bagging Model Accuracy:", accuracy_score(y_test, rf_pred))
+print("\nRandom Forest Bagging Model Classification Report:\n", classification_report(y_test, rf_pred))
