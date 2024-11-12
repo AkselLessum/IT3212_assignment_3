@@ -167,3 +167,24 @@ for score in scoresBoost:
     print("Random forest accuracy boosted", i, "base estimators:", score)
     i = i+2
 print("---------------------------------------------------------------")
+
+# Create a figure with 1 row and 2 columns of subplots
+fig, axes = plt.subplots(1, 2, figsize=(18, 6))  # Adjust figsize for wider layout
+
+# First plot
+axes[0].plot(estimator_range, scoresBag)
+axes[0].set_title("Accuracy Scores (Bagged Random Forest)", fontsize=18)
+axes[0].set_xlabel("n_estimators", fontsize=18)
+axes[0].set_ylabel("score", fontsize=18)
+axes[0].tick_params(labelsize=16)
+
+# Second plot
+axes[1].plot(estimator_range, scoresBoost)
+axes[1].set_title("Accuracy Scores (AdaBoost with Random Forest)", fontsize=18)
+axes[1].set_xlabel("n_estimators", fontsize=18)
+axes[1].set_ylabel("score", fontsize=18)
+axes[1].tick_params(labelsize=16)
+
+# Adjust layout and show the plots
+plt.tight_layout()
+plt.show()
