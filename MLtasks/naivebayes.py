@@ -150,4 +150,9 @@ y_pred = gnb.predict(X_test_pca)
 print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
 
 
+#now implement logistic regression
+logreg = LogisticRegression(max_iter=2000)
+logreg.fit(X_train_pca, y_train)
+y_pred = logreg.predict(X_test_pca)
 
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
