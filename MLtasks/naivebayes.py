@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
+from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import AdaBoostClassifier
 
 df = pd.read_csv('../graduation_dataset.csv')
 
@@ -87,9 +89,7 @@ for col in outlier_columns:
     df[col] = df[col].clip(lower=lower_bound, upper=upper_bound)
 
 # Save the cleaned DataFrame to a new CSV
-output_path = 'cleaned_data.csv'
-df.to_csv(output_path, index=False)
-print(f"Outlier handling complete. Cleaned dataset saved to '{output_path}'.")
+
 
 
 #RFE AND LDA
@@ -134,25 +134,74 @@ plt.show()'''
 scaler = MinMaxScaler()
 X_train_pca = scaler.fit_transform(X_train_selected)
 X_test_pca = scaler.transform(X_test_selected)
-#print(X_train_pca)
+print(X_train_pca)
 
 # Do PCA to not reduce dimensionality too far
 pca = PCA(n_components=8)
 X_train_pca = pca.fit_transform(X_train_pca)
 X_test_pca = pca.transform(X_test_pca)
 
-#Implement the following algorith: Naïve Bayes
+# convert preprocessed data to csv
+X_train_pca_df = pd.DataFrame(X_train_pca)
+X_test_pca_df = pd.DataFrame(X_test_pca)
+
+X_train_pca_df.to_csv('X_train_preprocessed.csv', index=False)
+X_test_pca_df.to_csv('X_test_preprocessed.csv', index=False)
+
+
+'''
+#logistic regression
+logreg = LogisticRegression(max_iter=2000)
+logreg.fit(X_train_pca, y_train)
+y_pred = logreg.predict(X_test_pca)
+
+#print how many lines there are in the test set
+print(len(y_test))
+
+
+print("Accuracy base model:", metrics.accuracy_score(y_test, y_pred))
+
+#Implement boosting and bagging with logistic regression
+
+
+
+
+# Bagging
+bagging = BaggingClassifier(estimator=LogisticRegression(max_iter=2000), n_estimators=25)
+bagging.fit(X_train_pca, y_train)
+y_pred = bagging.predict(X_test_pca)
+print("Accuracy Bagging:", metrics.accuracy_score(y_test, y_pred))
+
+#boosting
+boosting = AdaBoostClassifier(estimator=LogisticRegression(max_iter=2000), n_estimators=100, algorithm='SAMME')
+boosting.fit(X_train_pca, y_train)
+y_pred = boosting.predict(X_test_pca)
+print("Accuracy Boosting:", metrics.accuracy_score(y_test, y_pred))
+'''
+
+#Naïve Bayes
 
 gnb = GaussianNB()
 gnb.fit(X_train_pca, y_train)
 y_pred = gnb.predict(X_test_pca)
 
-print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+print("Base model accuracy:", metrics.accuracy_score(y_test, y_pred))
 
 
-#now implement logistic regression
-logreg = LogisticRegression(max_iter=2000)
-logreg.fit(X_train_pca, y_train)
-y_pred = logreg.predict(X_test_pca)
+#Bagging
+bagging = BaggingClassifier(estimator=GaussianNB(), n_estimators=25)
+bagging.fit(X_train_pca, y_train)
+y_pred = bagging.predict(X_test_pca)
+print("Accuracy Bagging:", metrics.accuracy_score(y_test, y_pred))
 
-print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+#Boosting
+boosting = AdaBoostClassifier(estimator=GaussianNB(), n_estimators=100, algorithm='SAMME')
+boosting.fit(X_train_pca, y_train)
+y_pred = boosting.predict(X_test_pca)
+print("Accuracy Boosting:", metrics.accuracy_score(y_test, y_pred))
+
+
+
+
+
+
