@@ -7,8 +7,10 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.naive_bayes import GaussianNB
+from sklearn import metrics
 
-df = pd.read_csv('graduation_dataset.csv')
+df = pd.read_csv('../graduation_dataset.csv')
 
 '''print(df.info())
 print(df.head())'''
@@ -138,3 +140,14 @@ X_test_pca = scaler.transform(X_test_selected)
 pca = PCA(n_components=8)
 X_train_pca = pca.fit_transform(X_train_pca)
 X_test_pca = pca.transform(X_test_pca)
+
+#Implement the following algorith: Naïve Bayes
+
+gnb = GaussianNB()
+gnb.fit(X_train_pca, y_train)
+y_pred = gnb.predict(X_test_pca)
+
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
+
+
+
