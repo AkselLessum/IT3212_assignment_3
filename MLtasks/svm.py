@@ -8,10 +8,11 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.svm import SVC
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -123,20 +124,16 @@ pca = PCA(n_components=8)
 X_train_pca = pca.fit_transform(X_train_pca)
 X_test_pca = pca.transform(X_test_pca)
 
+# Support vector machine
+svm_rbf = SVC(kernel='rbf', gamma=0.5, C=1)
+svm_rbf.fit(X_train_pca, y_train)
+pred_rbf = svm_rbf.predict(X_test_pca)
+print("SVM accuracy score (RBF): ", accuracy_score(y_test, pred_rbf))
 
-# Random forest code
-# Create model
-model = RandomForestClassifier(n_estimators=200)
-model.fit(X_train_pca, y_train)
-
-y_pred_test = model.predict(X_test_pca)
-y_pred_train = model.predict(X_train_pca)
-
-print("Accuracy scores before bagging and boosting:")
-print("Random Forest accuracy (TRAIN): ", accuracy_score(y_train, y_pred_train))
-print("Random Forest accuracy (TEST): ", accuracy_score(y_test, y_pred_test))
-print("---------------------------------------------------------------")
-
+svm_linear = SVC(kernel='linear', C=1, probability=True)
+svm_linear.fit(X_train_pca, y_train)
+pred_linear = svm_linear.predict(X_test_pca)
+print("SVM accuracy score (Linear): ", accuracy_score(y_test, pred_linear))
 
 estimator_range = [2,4,6,8,10,12,14,16]
 scoresBag = []
@@ -144,24 +141,23 @@ scoresBoost = []
 
 for n_estimators in estimator_range:
     # Create the bagging classifier
-    model_bag = BaggingClassifier(n_estimators=n_estimators, estimator=model, random_state=42)
+    model_bag = BaggingClassifier(n_estimators=n_estimators, estimator=svm_linear, random_state=42)
     # Fit on training set
     model_bag.fit(X_train_pca, y_train)
     pred = model_bag.predict(X_test_pca)
     scoresBag.append(accuracy_score(y_test, pred))
+
+for n_estimators in estimator_range:
+    adaboost_rf = AdaBoostClassifier(estimator=svm_linear, n_estimators=n_estimators, learning_rate=0.1, algorithm='SAMME.R')
+    adaboost_rf.fit(X_train_pca, y_train)
+    pred = adaboost_rf.predict(X_test_pca)
+    scoresBoost.append(accuracy_score(y_test, pred))
 
 i=2
 for score in scoresBag:
     print("Random forest accuracy bagged", i, "base estimators:", score)
     i = i+2
 print("---------------------------------------------------------------")
-
-for n_estimators in estimator_range:
-    adaboost_rf = AdaBoostClassifier(estimator=model, n_estimators=n_estimators, learning_rate=0.1)
-    adaboost_rf.fit(X_train_pca, y_train)
-    pred = adaboost_rf.predict(X_test_pca)
-    scoresBoost.append(accuracy_score(y_test, pred))
-
 i=2
 for score in scoresBoost:
     print("Random forest accuracy boosted", i, "base estimators:", score)
@@ -170,7 +166,7 @@ print("---------------------------------------------------------------")
 
 # Create a figure with 1 row and 2 columns of subplots
 fig, axes = plt.subplots(1, 2, figsize=(18, 6))  # Adjust figsize for wider layout
-org_acc = round(accuracy_score(y_test, y_pred_test), 2)
+org_acc = round(accuracy_score(y_test, pred_linear), 2)
 
 # First plot
 axes[0].plot(estimator_range, scoresBag)
