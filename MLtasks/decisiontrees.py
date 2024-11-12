@@ -80,10 +80,10 @@ for col in outlier_columns:
     lower_bound, upper_bound = calculate_iqr_bounds(df, col, iqr_multiplier)
     outlier_count = count_outliers(df, col, lower_bound, upper_bound)
     
-    print(f"Processing '{col}':")
-    print(f"  - Lower Bound: {lower_bound}")
-    print(f"  - Upper Bound: {upper_bound}")
-    print(f"  - Outliers Detected: {outlier_count}")
+    #print(f"Processing '{col}':")
+    #print(f"  - Lower Bound: {lower_bound}")
+    #print(f"  - Upper Bound: {upper_bound}")
+    #print(f"  - Outliers Detected: {outlier_count}")
     
     # Cap the outliers within the specified bounds
     df[col] = df[col].clip(lower=lower_bound, upper=upper_bound)
@@ -91,7 +91,7 @@ for col in outlier_columns:
 # Save the cleaned DataFrame to a new CSV
 output_path = 'cleaned_data.csv'
 df.to_csv(output_path, index=False)
-print(f"Outlier handling complete. Cleaned dataset saved to '{output_path}'.")
+#print(f"Outlier handling complete. Cleaned dataset saved to '{output_path}'.")
 
 
 #RFE AND LDA
@@ -129,5 +129,13 @@ dtree = DecisionTreeClassifier()
 dtree.fit(X_train_pca, y_train)
 
 #predict
-y_pred = dtree.predict(X_test_pca)
-print("Decision Trees accuracy: ", accuracy_score(y_test, y_pred))
+y_pred_test= dtree.predict(X_test_pca)
+y_pred_train = dtree.predict(X_train_pca)
+print("Decision Trees accuracy (TRAIN): ", accuracy_score(y_train, y_pred_train))
+print("Decision Trees accuracy (TEST): ", accuracy_score(y_test, y_pred_test))
+
+# Bagging and boosting
+estimator_range = [2,4,6,8,10,12,14,16]
+scoresBag = []
+scoresBoost = []
+
