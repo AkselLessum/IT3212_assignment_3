@@ -140,7 +140,7 @@ print("Decision Trees accuracy (TEST): ", accuracy_score(y_test, y_pred_test))
 
 # Bagging and boosting
 estimator_range = [2,4,6,8,10,12,14,16]
-random_range = [2,4,6,8,10,12,14,16]
+#random_range = [2,4,6,8,10,12,14,16]
 scoresBag = []
 scoresBoost = []
 
@@ -153,7 +153,7 @@ for n_estimators in estimator_range:
     scoresBag.append(accuracy_score(y_test, pred))
 
 i=2
-j=2
+#j=2
 for score in scoresBag:
     print("Decision Trees accuracy bagged", i, "base estimators:", score)
     i = i+2
@@ -161,6 +161,7 @@ print("---------------------------------------------------------------")
 
 for n_estimators in estimator_range:
     # Create the boosting classifier, 42 funny number
+    #TODO: add learning rate, tweak
     model_boost = AdaBoostClassifier(n_estimators=n_estimators, estimator=dtree, random_state=42, algorithm='SAMME')
     # Fit on training set
     model_boost.fit(X_train_pca, y_train)

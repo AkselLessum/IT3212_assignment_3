@@ -8,10 +8,11 @@ from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.svm import SVC
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -123,16 +124,44 @@ pca = PCA(n_components=8)
 X_train_pca = pca.fit_transform(X_train_pca)
 X_test_pca = pca.transform(X_test_pca)
 
+# SVM linear
+svm_linear = SVC(kernel='linear', C=1, probability=True)
+svm_linear.fit(X_train_pca, y_train)
+pred_linear = svm_linear.predict(X_test_pca)
+print("SVM accuracy score (Linear): ", accuracy_score(y_test, pred_linear))
 
-# Random forest code
-# Create model
-model = RandomForestClassifier(n_estimators=200)
-model.fit(X_train_pca, y_train)
+estimator_range = [2,4,6,8,10,12,14,16]
+scoresBag = []
+scoresBoost = []
 
-y_pred_test = model.predict(X_test_pca)
-y_pred_train = model.predict(X_train_pca)
+for n_estimators in estimator_range:
+    # Create the bagging classifier
+    model_bag = BaggingClassifier(n_estimators=n_estimators, estimator=svm_linear, random_state=42)
+    # Fit on training set
+    model_bag.fit(X_train_pca, y_train)
+    pred = model_bag.predict(X_test_pca)
+    scoresBag.append(accuracy_score(y_test, pred))
 
-print("Accuracy scores before bagging and boosting:")
-print("Random Forest accuracy (TRAIN): ", accuracy_score(y_train, y_pred_train))
-print("Random Forest accuracy (TEST): ", accuracy_score(y_test, y_pred_test))
+for n_estimators in estimator_range:
+    adaboost_rf = AdaBoostClassifier(estimator=svm_linear, n_estimators=n_estimators, learning_rate=0.1, algorithm='SAMME.R')
+    adaboost_rf.fit(X_train_pca, y_train)
+    pred = adaboost_rf.predict(X_test_pca)
+    scoresBoost.append(accuracy_score(y_test, pred))
+
+i=2
+for score in scoresBag:
+    print("Random forest accuracy bagged", i, "base estimators:", score)
+    i = i+2
 print("---------------------------------------------------------------")
+i=2
+for score in scoresBoost:
+    print("Random forest accuracy boosted", i, "base estimators:", score)
+    i = i+2
+print("---------------------------------------------------------------")
+
+# Transfer learning code
+# use 90% of the data for transfer training
+# Train ours on the 10 remaining percent
+# within themselves we need to have a training set (80%) and a test set (20%)
+# Somehow use the big dataset on the smaller one
+# For our case, combine the test sets to make a validation set for the full implementation. 
