@@ -197,3 +197,4 @@ axes[1].legend(fontsize=14)  # Add legend for the label
 # Adjust layout and show the plots
 plt.tight_layout()
 plt.show()
+print("---------------------------------------------------------------")
