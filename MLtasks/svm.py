@@ -170,7 +170,7 @@ org_acc = round(accuracy_score(y_test, pred_linear), 2)
 
 # First plot
 axes[0].plot(estimator_range, scoresBag)
-axes[0].set_title("Accuracy Scores (Bagged Random Forest)", fontsize=18)
+axes[0].set_title("Accuracy Scores (Bagged SVM)", fontsize=18)
 axes[0].set_xlabel("n_estimators", fontsize=18)
 axes[0].set_ylabel("score", fontsize=18)
 axes[0].tick_params(labelsize=16)
@@ -181,7 +181,7 @@ axes[0].legend(fontsize=14)  # Add legend for the label
 
 # Second plot
 axes[1].plot(estimator_range, scoresBoost)
-axes[1].set_title("Accuracy Scores (AdaBoost with Random Forest)", fontsize=18)
+axes[1].set_title("Accuracy Scores (AdaBoost SVM)", fontsize=18)
 axes[1].set_xlabel("n_estimators", fontsize=18)
 axes[1].set_ylabel("score", fontsize=18)
 axes[1].tick_params(labelsize=16)
