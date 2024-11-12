@@ -105,59 +105,40 @@ rfe.fit(X_train, y_train)
 X_train_selected = rfe.transform(X_train)
 X_test_selected = rfe.transform(X_test)
 
-'''selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
-print(selected_features.info())'''
-
-# LDA wants fewer dimensions than the number of classes: 1 class for binary classification
-'''lda = LinearDiscriminantAnalysis(n_components=1)
-X_train_lda = lda.fit_transform(X_train_selected, y_train)
-X_test_lda = lda.transform(rfe.transform(X_test))'''
-
 # Min-max scaling
 scaler = MinMaxScaler()
 X_train_pca = scaler.fit_transform(X_train_selected)
 X_test_pca = scaler.transform(X_test_selected)
 #print(X_train_pca)
 
+#Train
+X_source_train, X_target_train, y_source_train, y_target_train = train_test_split(X_train_pca, y_train, test_size=0.1, random_state=42)
+#Test
+X_source_test, X_target_test, y_source_test, y_target_test = train_test_split(X_test_pca, y_train, test_size=0.1, random_state=42)
+
+
+
 # Do PCA to not reduce dimensionality too far
 pca = PCA(n_components=8)
-X_train_pca = pca.fit_transform(X_train_pca)
-X_test_pca = pca.transform(X_test_pca)
+X_source_train_pca = pca.fit_transform(X_source_train)
+X_source_test_pca = pca.transform(X_source_test)
+
+pca_target = PCA(n_components=4) # Changed the components to mix up the set
+X_target_train_pca = pca_target.fit_transform(X_target_train)
+X_target_test_pca = pca_target.transform(X_target_test)
 
 # SVM linear
-svm_linear = SVC(kernel='linear', C=1, probability=True)
-svm_linear.fit(X_train_pca, y_train)
-pred_linear = svm_linear.predict(X_test_pca)
-print("SVM accuracy score (Linear): ", accuracy_score(y_test, pred_linear))
+svm_source = SVC(kernel='linear', C=1, probability=True)
+svm_source.fit(X_source_train_pca, y_source_train)
+pred_linear = svm_source.predict(X_source_test_pca) # Predict on the test set, only big model
+print("\"BIG MODEL\" SVM accuracy score (Linear): ", accuracy_score(y_source_test, pred_linear))
 
-estimator_range = [2,4,6,8,10,12,14,16]
-scoresBag = []
-scoresBoost = []
+svm_target = svm_source
+svm_target.fit(X_target_train_pca, y_target_train)
+pred_final = svm_target.predict(X_target_test_pca) # Predict on the test set, only small model
+print("\"Transfer\" SVM accuracy score (Linear): ", accuracy_score(y_target_test, pred_final))
 
-for n_estimators in estimator_range:
-    # Create the bagging classifier
-    model_bag = BaggingClassifier(n_estimators=n_estimators, estimator=svm_linear, random_state=42)
-    # Fit on training set
-    model_bag.fit(X_train_pca, y_train)
-    pred = model_bag.predict(X_test_pca)
-    scoresBag.append(accuracy_score(y_test, pred))
 
-for n_estimators in estimator_range:
-    adaboost_rf = AdaBoostClassifier(estimator=svm_linear, n_estimators=n_estimators, learning_rate=0.1, algorithm='SAMME.R')
-    adaboost_rf.fit(X_train_pca, y_train)
-    pred = adaboost_rf.predict(X_test_pca)
-    scoresBoost.append(accuracy_score(y_test, pred))
-
-i=2
-for score in scoresBag:
-    print("Random forest accuracy bagged", i, "base estimators:", score)
-    i = i+2
-print("---------------------------------------------------------------")
-i=2
-for score in scoresBoost:
-    print("Random forest accuracy boosted", i, "base estimators:", score)
-    i = i+2
-print("---------------------------------------------------------------")
 
 # Transfer learning code
 # use 90% of the data for transfer training
@@ -165,3 +146,15 @@ print("---------------------------------------------------------------")
 # within themselves we need to have a training set (80%) and a test set (20%)
 # Somehow use the big dataset on the smaller one
 # For our case, combine the test sets to make a validation set for the full implementation. 
+
+# 1. Train the SVM on the source (larger) dataset
+#svm_source = SVC(kernel='linear', random_state=42)
+#svm_source.fit(X_source_scaled, y_source)
+
+# Evaluate the model on the source dataset (just to check how it performs on the source)
+#y_pred_source = svm_source.predict(X_source_scaled)
+#print("Accuracy on the source dataset:", accuracy_score(y_source, y_pred_source))
+
+# 2. Fine-tune the SVM model on the target (smaller) dataset
+#svm_target = svm_source  # Use the trained model as a starting point
+#svm_target.fit(X_target_scaled, y_target)
