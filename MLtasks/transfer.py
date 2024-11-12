@@ -107,14 +107,14 @@ X_test_selected = rfe.transform(X_test)
 
 # Min-max scaling
 scaler = MinMaxScaler()
-X_train_pca = scaler.fit_transform(X_train_selected)
-X_test_pca = scaler.transform(X_test_selected)
+X_train = scaler.fit_transform(X_train_selected)
+X_test = scaler.transform(X_test_selected)
 #print(X_train_pca)
 
 #Train
-X_source_train, X_target_train, y_source_train, y_target_train = train_test_split(X_train_pca, y_train, test_size=0.1, random_state=42)
+X_source_train, X_target_train, y_source_train, y_target_train = train_test_split(X_train, y_train, test_size=0.1, random_state=42)
 #Test
-X_source_test, X_target_test, y_source_test, y_target_test = train_test_split(X_test_pca, y_train, test_size=0.1, random_state=42)
+X_source_test, X_target_test, y_source_test, y_target_test = train_test_split(X_test, y_test, test_size=0.1, random_state=42)
 
 
 
@@ -138,6 +138,8 @@ svm_target.fit(X_target_train_pca, y_target_train)
 pred_final = svm_target.predict(X_target_test_pca) # Predict on the test set, only small model
 print("\"Transfer\" SVM accuracy score (Linear): ", accuracy_score(y_target_test, pred_final))
 
+#"BIG MODEL" SVM accuracy score (Linear):  0.8203517587939698
+#"Transfer" SVM accuracy score (Linear):  0.7303370786516854
 
 
 # Transfer learning code
