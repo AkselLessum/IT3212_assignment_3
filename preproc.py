@@ -128,13 +128,13 @@ plt.yticks([])  # Hide y-axis
 plt.grid()
 plt.show()'''
 
-# PCA
-pca = PCA(n_components=10)
-X_train_pca = pca.fit_transform(X_train_selected)
-X_test_pca = pca.transform(rfe.transform(X_test))
-
 # Min-max scaling
 scaler = MinMaxScaler()
-X_train_pca = scaler.fit_transform(X_train_pca)
-X_test_pca = scaler.transform(X_test_pca)
+X_train_pca = scaler.fit_transform(X_train_selected)
+X_test_pca = scaler.transform(X_test_selected)
 #print(X_train_pca)
+
+# Do PCA to not reduce dimensionality too far
+pca = PCA(n_components=8)
+X_train_pca = pca.fit_transform(X_train_pca)
+X_test_pca = pca.transform(X_test_pca)
