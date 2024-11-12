@@ -10,6 +10,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.ensemble import BaggingClassifier
+from sklearn.ensemble import AdaBoostClassifier
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -79,10 +81,10 @@ for col in outlier_columns:
     lower_bound, upper_bound = calculate_iqr_bounds(df, col, iqr_multiplier)
     outlier_count = count_outliers(df, col, lower_bound, upper_bound)
     
-    print(f"Processing '{col}':")
+    '''print(f"Processing '{col}':")
     print(f"  - Lower Bound: {lower_bound}")
     print(f"  - Upper Bound: {upper_bound}")
-    print(f"  - Outliers Detected: {outlier_count}")
+    print(f"  - Outliers Detected: {outlier_count}")'''
     
     # Cap the outliers within the specified bounds
     df[col] = df[col].clip(lower=lower_bound, upper=upper_bound)
@@ -127,5 +129,41 @@ X_test_pca = pca.transform(X_test_pca)
 model = RandomForestClassifier(n_estimators=200)
 model.fit(X_train_pca, y_train)
 
-y_pred = model.predict(X_test_pca)
-print("Random Forest accuracy: ", accuracy_score(y_test, y_pred))
+y_pred_test = model.predict(X_test_pca)
+y_pred_train = model.predict(X_train_pca)
+
+print("Accuracy scores before bagging and boosting:")
+print("Random Forest accuracy (TRAIN): ", accuracy_score(y_train, y_pred_train))
+print("Random Forest accuracy (TEST): ", accuracy_score(y_test, y_pred_test))
+print("---------------------------------------------------------------")
+
+
+estimator_range = [2,4,6,8,10,12,14,16]
+scoresBag = []
+scoresBoost = []
+
+for n_estimators in estimator_range:
+    # Create the bagging classifier
+    model_bag = BaggingClassifier(n_estimators=n_estimators, estimator=model, random_state=42)
+    # Fit on training set
+    model_bag.fit(X_train_pca, y_train)
+    pred = model_bag.predict(X_test_pca)
+    scoresBag.append(accuracy_score(y_test, pred))
+
+i=2
+for score in scoresBag:
+    print("Random forest accuracy bagged", i, "base estimators:", score)
+    i = i+2
+print("---------------------------------------------------------------")
+
+for n_estimators in estimator_range:
+    adaboost_rf = AdaBoostClassifier(estimator=model, n_estimators=n_estimators, learning_rate=0.1)
+    adaboost_rf.fit(X_train_pca, y_train)
+    pred = adaboost_rf.predict(X_test_pca)
+    scoresBoost.append(accuracy_score(y_test, pred))
+
+i=2
+for score in scoresBoost:
+    print("Random forest accuracy boosted", i, "base estimators:", score)
+    i = i+2
+print("---------------------------------------------------------------")
