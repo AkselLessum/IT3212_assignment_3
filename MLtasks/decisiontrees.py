@@ -10,6 +10,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.tree import DecisionTreeClassifier
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -122,3 +123,11 @@ X_train_pca = pca.fit_transform(X_train_pca)
 X_test_pca = pca.transform(X_test_pca)
 
 # decision trees code
+
+
+dtree = DecisionTreeClassifier()
+dtree.fit(X_train_pca, y_train)
+
+#predict
+y_pred = dtree.predict(X_test_pca)
+print("Decision Trees accuracy: ", accuracy_score(y_test, y_pred))
