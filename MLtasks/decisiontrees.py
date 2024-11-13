@@ -138,12 +138,13 @@ y_pred_train = dtree.predict(X_train_pca)
 print("Decision Trees accuracy (TRAIN): ", accuracy_score(y_train, y_pred_train))
 print("Decision Trees accuracy (TEST): ", accuracy_score(y_test, y_pred_test))
 
+import time
 # Bagging and boosting
 estimator_range = [2,4,6,8,10,12,14,16]
 #random_range = [2,4,6,8,10,12,14,16]
 scoresBag = []
 scoresBoost = []
-
+start_time_bag = time.time()
 for n_estimators in estimator_range:
     # Create the bagging classifier, 42 funny number
     model_bag = BaggingClassifier(n_estimators=n_estimators, estimator=dtree, random_state=42)
@@ -151,7 +152,9 @@ for n_estimators in estimator_range:
     model_bag.fit(X_train_pca, y_train)
     pred = model_bag.predict(X_test_pca)
     scoresBag.append(accuracy_score(y_test, pred))
-
+end_time_bag = time.time()
+elapsed_time_bag = end_time_bag - start_time_bag
+print("Time taken for bagging:", elapsed_time_bag)
 i=2
 #j=2
 for score in scoresBag:
@@ -159,6 +162,7 @@ for score in scoresBag:
     i = i+2
 print("---------------------------------------------------------------")
 
+start_time_boost = time.time()
 for n_estimators in estimator_range:
     # Create the boosting classifier, 42 funny number
     #TODO: add learning rate, tweak
@@ -167,7 +171,9 @@ for n_estimators in estimator_range:
     model_boost.fit(X_train_pca, y_train)
     pred = model_boost.predict(X_test_pca)
     scoresBoost.append(accuracy_score(y_test, pred))
-    
+end_time_boost = time.time()
+elapsed_time_boost = end_time_boost - start_time_boost
+print("Time taken for boosting:", elapsed_time_boost)
 i=2
 for score in scoresBoost:
     print("Decision Trees accuracy boosted", i, "base estimators:", score)
