@@ -13,6 +13,7 @@ from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.svm import SVC
+from sklearn.linear_model import SGDClassifier
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -123,18 +124,19 @@ pca = PCA(n_components=8)
 X_source_train_pca = pca.fit_transform(X_source_train)
 X_source_test_pca = pca.transform(X_source_test)
 
-pca_target = PCA(n_components=4) # Changed the components to mix up the set
+pca_target = PCA(n_components=8)
 X_target_train_pca = pca_target.fit_transform(X_target_train)
 X_target_test_pca = pca_target.transform(X_target_test)
 
-# SVM linear
-svm_source = SVC(kernel='linear', C=1, probability=True)
+# SDG (SVM) linear
+svm_source = SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, random_state=42, max_iter=5, tol=None)
 svm_source.fit(X_source_train_pca, y_source_train)
 pred_linear = svm_source.predict(X_source_test_pca) # Predict on the test set, only big model
 print("\"BIG MODEL\" SVM accuracy score (Linear): ", accuracy_score(y_source_test, pred_linear))
 
-svm_target = svm_source
-svm_target.fit(X_target_train_pca, y_target_train)
+svm_target = SGDClassifier(loss='hinge', penalty='l2', alpha=1e-3, random_state=42, max_iter=5, tol=None)
+svm_target.fit(X_source_train_pca, y_source_train)
+svm_target.partial_fit(X_target_train_pca, y_target_train)
 pred_final = svm_target.predict(X_target_test_pca) # Predict on the test set, only small model
 print("\"Transfer\" SVM accuracy score (Linear): ", accuracy_score(y_target_test, pred_final))
 

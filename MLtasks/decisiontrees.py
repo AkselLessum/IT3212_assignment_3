@@ -13,7 +13,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
-
+import time
 #TODO: make randomstate and array of values, and loop through them to get the best accuracy
 
 df = pd.read_csv('graduation_dataset.csv')
@@ -138,7 +138,6 @@ y_pred_train = dtree.predict(X_train_pca)
 print("Decision Trees accuracy (TRAIN): ", accuracy_score(y_train, y_pred_train))
 print("Decision Trees accuracy (TEST): ", accuracy_score(y_test, y_pred_test))
 
-import time
 # Bagging and boosting
 estimator_range = [2,4,6,8,10,12,14,16]
 #random_range = [2,4,6,8,10,12,14,16]
