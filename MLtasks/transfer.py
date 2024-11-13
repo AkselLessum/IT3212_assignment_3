@@ -141,6 +141,7 @@ print("\"Transfer\" SVM accuracy score (Linear): ", accuracy_score(y_target_test
 #"BIG MODEL" SVM accuracy score (Linear):  0.8203517587939698
 #"Transfer" SVM accuracy score (Linear):  0.7303370786516854
 
+#TODO: plot
 
 # Transfer learning code
 # use 90% of the data for transfer training
