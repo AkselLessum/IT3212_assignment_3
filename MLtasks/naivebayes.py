@@ -11,8 +11,10 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
 from sklearn.ensemble import BaggingClassifier
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.metrics import accuracy_score
 
-df = pd.read_csv('../graduation_dataset.csv')
+
+df = pd.read_csv('./graduation_dataset.csv')
 
 '''print(df.info())
 print(df.head())'''
@@ -145,8 +147,8 @@ X_test_pca = pca.transform(X_test_pca)
 X_train_pca_df = pd.DataFrame(X_train_pca)
 X_test_pca_df = pd.DataFrame(X_test_pca)
 
-X_train_pca_df.to_csv('X_train_preprocessed.csv', index=False)
-X_test_pca_df.to_csv('X_test_preprocessed.csv', index=False)
+#X_train_pca_df.to_csv('X_train_preprocessed.csv', index=False)
+#X_test_pca_df.to_csv('X_test_preprocessed.csv', index=False)
 
 
 '''
@@ -183,9 +185,9 @@ print("Accuracy Boosting:", metrics.accuracy_score(y_test, y_pred))
 
 gnb = GaussianNB()
 gnb.fit(X_train_pca, y_train)
-y_pred = gnb.predict(X_test_pca)
+y_pred_base = gnb.predict(X_test_pca)
 
-print("Base model accuracy:", metrics.accuracy_score(y_test, y_pred))
+print("Base model accuracy:", metrics.accuracy_score(y_test, y_pred_base))
 
 
 #Bagging
@@ -201,7 +203,68 @@ y_pred = boosting.predict(X_test_pca)
 print("Accuracy Boosting:", metrics.accuracy_score(y_test, y_pred))
 
 
+estimator_range = [2,4,6,8,10,12,14,16]
+scoresBag = []
+scoresBoost = []
+for n_estimators in estimator_range:
+    # Create the bagging classifier, 42 funny number
+    bagging = BaggingClassifier(estimator=GaussianNB(), n_estimators=n_estimators, random_state=42)
+    # Fit on training set
+    bagging.fit(X_train_pca, y_train)
+    pred = bagging.predict(X_test_pca)
+    scoresBag.append(accuracy_score(y_test, pred))
+i=2
+for score in scoresBag:
+    print("Naive bayes accuracy bagged", i, "base estimators:", score)
+    i = i+2
+print("---------------------------------------------------------------")
 
+for n_estimators in estimator_range:
+    # Create the boosting classifier, 42 funny number
+    #TODO: add learning rate, tweak
+    boosting = AdaBoostClassifier(estimator=GaussianNB(), n_estimators=n_estimators, random_state=42, algorithm='SAMME')
+    # Fit on training set
+    boosting.fit(X_train_pca, y_train)
+    pred = boosting.predict(X_test_pca)
+    scoresBoost.append(accuracy_score(y_test, pred))
+i=2
+for score in scoresBoost:
+    print("Naive bayes accuracy boosted", i, "base estimators:", score)
+    i = i+2
+print("---------------------------------------------------------------")
 
+# Create a figure with 1 row and 2 columns of subplots
+fig, axes = plt.subplots(1, 2, figsize=(18, 6))  # Adjust figsize for wider layout
+org_acc = round(accuracy_score(y_test, y_pred_base), 2)
+print("TESTING")
+print(org_acc)
+print(accuracy_score(y_test, y_pred_base))
+print("COMPLETE")
 
+# First plot
+axes[0].plot(estimator_range, scoresBag)
+axes[0].set_title("Accuracy Scores (Bagged Naive bayes)", fontsize=18)
+axes[0].set_xlabel("n_estimators", fontsize=18)
+axes[0].set_ylabel("score", fontsize=18)
+axes[0].tick_params(labelsize=16)
+
+# Add the red stippled line with label on the second plot
+axes[0].axhline(y=org_acc, color='red', linestyle=':', linewidth=2, label=f'Original score = {org_acc}')
+axes[0].legend(fontsize=14)  # Add legend for the label
+
+# Second plot
+axes[1].plot(estimator_range, scoresBoost)
+axes[1].set_title("Accuracy Scores (AdaBoost with Naive bayes)", fontsize=18)
+axes[1].set_xlabel("n_estimators", fontsize=18)
+axes[1].set_ylabel("score", fontsize=18)
+axes[1].tick_params(labelsize=16)
+
+# Add the red stippled line with label on the second plot
+axes[1].axhline(y=org_acc, color='red', linestyle=':', linewidth=2, label=f'Original score = {org_acc}')
+axes[1].legend(fontsize=14)  # Add legend for the label
+
+# Adjust layout and show the plots
+plt.tight_layout()
+plt.show()
+print("---------------------------------------------------------------")
 
