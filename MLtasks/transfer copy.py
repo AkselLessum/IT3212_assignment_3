@@ -110,7 +110,6 @@ X_test_selected = rfe.transform(X_test)
 scaler = MinMaxScaler()
 X_train = scaler.fit_transform(X_train_selected)
 X_test = scaler.transform(X_test_selected)
-#print(X_train_pca)
 
 #Train
 X_source_train, X_target_train, y_source_train, y_target_train = train_test_split(X_train, y_train, test_size=0.1, random_state=42)
@@ -161,9 +160,6 @@ plt.ylim(0, 1)  # Set y-axis limits from 0 to 1
 plt.ylabel('Accuracy Score')
 plt.title('SVM Accuracy Scores: 90% of dataset model vs Transfer')
 plt.show()
-
-#TODO: plot
-
 
 # Transfer learning code
 # use 90% of the data for transfer training
