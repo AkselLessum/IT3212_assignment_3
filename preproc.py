@@ -7,6 +7,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import PolynomialFeatures
 
 df = pd.read_csv('graduation_dataset.csv')
 
@@ -101,6 +102,14 @@ X_test_selected = rfe.transform(X_test)
 
 '''selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
 print(selected_features.info())'''
+
+poly = PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)
+X_train_poly = poly.fit_transform(X_train_selected)  # Use features selected by RFE
+X_test_poly = poly.transform(X_test_selected)
+
+#visualize the selected features
+selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
+print(selected_features.info())
 
 
 # Min-max scaling
