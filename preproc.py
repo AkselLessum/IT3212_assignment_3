@@ -102,17 +102,39 @@ X_test_selected = rfe.transform(X_test)
 '''selected_features = pd.DataFrame(X_train_selected, columns=X_train.columns[rfe.support_])
 print(selected_features.info())'''
 
+
+# Min-max scaling
+scaler = MinMaxScaler()
+X_train_pca = scaler.fit_transform(X_train_selected)
+X_test_pca = scaler.transform(X_test_selected)
+#print(X_train_pca)
+
+# Do PCA to not reduce dimensionality too far
+pca = PCA(n_components=15)
+X_train_pca = pca.fit_transform(X_train_pca)
+X_test_pca = pca.transform(X_test_pca)
+
 # LDA wants fewer dimensions than the number of classes: 1 class for binary classification
 # LDA might reduce dimensionality too much tbh
-'''lda = LinearDiscriminantAnalysis(n_components=1)
-X_train_lda = lda.fit_transform(X_train_selected, y_train)
-X_test_lda = lda.transform(rfe.transform(X_test))
+# LDA
+lda = LinearDiscriminantAnalysis(n_components=1)  # Binary classification
+X_train_lda = lda.fit_transform(X_train_pca, y_train)
+X_test_lda = lda.transform(X_test_pca)
 
-print("Shape of LDA-transformed training data:", X_train_lda.shape)
-print("Shape of LDA-transformed test data:", X_test_lda.shape)
+# Visualize LDA results
+lda_df = pd.DataFrame(data=X_train_lda, columns=['LDA Component'])
+lda_df['Target'] = y_train.values  # Add the target variable for coloring
 
-# Optionally, you can analyze the LDA components
-print("LDA Components:", lda.coef_)  # This shows the direction of the separation'''
+# Scatter plot of LDA components
+plt.figure(figsize=(8, 6))
+colors = ['red' if label == 1 else 'blue' for label in lda_df['Target']]
+plt.scatter(lda_df['LDA Component'], [0]*len(lda_df), c=colors, alpha=0.5)
+plt.title('LDA: Projected Data Points')
+plt.xlabel('LDA Component 1')
+plt.yticks([])  # Hide y-axis
+plt.grid()
+plt.show()
+
 
 '''# Visualize LDA results
 lda_df = pd.DataFrame(data=X_train_lda, columns=['LDA Component'])
@@ -128,13 +150,5 @@ plt.yticks([])  # Hide y-axis
 plt.grid()
 plt.show()'''
 
-# Min-max scaling
-scaler = MinMaxScaler()
-X_train_pca = scaler.fit_transform(X_train_selected)
-X_test_pca = scaler.transform(X_test_selected)
-#print(X_train_pca)
 
-# Do PCA to not reduce dimensionality too far
-pca = PCA(n_components=8)
-X_train_pca = pca.fit_transform(X_train_pca)
-X_test_pca = pca.transform(X_test_pca)
+
